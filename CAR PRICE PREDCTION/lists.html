@@ -1,0 +1,46 @@
+Python Code (app.py)
+
+from flask import Flask, request, jsonify, render_template
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+app = Flask(_name_)
+
+# Sample dataset using lists
+data = {
+    "Year": [2010, 2012, 2015, 2018, 2020, 2021],
+    "Mileage": [100000, 80000, 50000, 30000, 20000, 10000],
+    "Price": [5000, 7000, 12000, 15000, 20000, 25000]
+}
+
+df = pd.DataFrame(data)
+
+# Splitting data
+X = df[["Year", "Mileage"]]
+y = df["Price"]
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/predict", methods=["POST"])
+def predict():
+    year = int(request.form["year"])
+    mileage = int(request.form["mileage"])
+    
+    prediction = model.predict([[year, mileage]])
+    price = round(prediction[0], 2)
+
+    return render_template("index.html", prediction_text=f"Estimated Car Price: ${price}")
+
+if _name_ == "_main_":
+    app.run(debug=True)
+
+
